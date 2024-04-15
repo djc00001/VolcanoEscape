@@ -3,15 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System;
+using UnityEngine.SceneManagement;
 
 public class Timer : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI timerText;
     [SerializeField] float remainingTime;
 
-    private void OnEnable()
+    AudioManager audioManager;
+
+    private void Awake()
     {
-//        remainingTime = 60f; // Reset remainingTime to 60 seconds when object is enabled
+        audioManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<AudioManager>();
     }
 
     // Update is called once per frame
@@ -20,10 +23,18 @@ public class Timer : MonoBehaviour
         if (remainingTime > 0)
         {
             remainingTime -= Time.deltaTime;
+
+            // Play volcano sound effect every minute
+            if (Mathf.Approximately(remainingTime % 60, 0))
+            {
+                audioManager.PlaySFX(audioManager.volcano);
+            }
         }
-        else if (remainingTime < 0)
+        else if (remainingTime <= 0)
         {
+            SceneManager.LoadScene(3); // Taken to lose screen
             remainingTime = 0;
+
         }
         int minutes = Mathf.FloorToInt(remainingTime / 60);
         int seconds = Mathf.FloorToInt(remainingTime % 60);
